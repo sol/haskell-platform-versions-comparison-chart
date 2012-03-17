@@ -1,1 +1,1 @@
-Nothing here, [go there!] (http://sol.github.com/haskell-platform-version-comparison/)!
+Nothing here, [go there] (http://sol.github.com/haskell-platform-version-comparison/)!
