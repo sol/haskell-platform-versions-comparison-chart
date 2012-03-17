@@ -214,17 +214,17 @@ hp_2010_2_0_0 = [
   , package "bytestring" "0.9.1.7"
   , package "containers" "0.3.0.0"
   , package "directory" "1.0.1.1"
-  , Package "dph-base" "0.4.0" True
-  , Package "dph-par" "0.4.0" True
-  , Package "dph-prim-interface" "0.4.0" True
-  , Package "dph-prim-par" "0.4.0" True
-  , Package "dph-prim-seq" "0.4.0" True
-  , Package "dph-seq" "0.4.0" True
+  , Package "dph-base" "0.4.0" False
+  , Package "dph-par" "0.4.0" False
+  , Package "dph-prim-interface" "0.4.0" False
+  , Package "dph-prim-par" "0.4.0" False
+  , Package "dph-prim-seq" "0.4.0" False
+  , Package "dph-seq" "0.4.0" False
   , package "extensible-exceptions" "0.1.1.1"
   , package "ffi" "1.0"
   , package "filepath" "1.1.0.4"
-  , Package "ghc" "6.12.3" True
-  , Package "ghc-binary" "0.5.0.2" True
+  , Package "ghc" "6.12.3" False
+  , Package "ghc-binary" "0.5.0.2" False
   , package "ghc-prim" "0.2.0.0"
   , package "haskell98" "1.0.1.1"
   , package "hpc" "0.5.0.5"
