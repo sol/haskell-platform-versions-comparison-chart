@@ -14,7 +14,12 @@ data Package = Package {
 package :: String -> String -> Package
 package name version = Package name version True
 
--- s/\(.*\)-\([^-]*\)$/  , package "\1" "\2"
+-- How to add a new release?
+--
+-- (1) ghc-pkg list
+-- (2) s/\(.*\)-\([^-]*\)$/  , package "\1" "\2"
+-- (3) manually adjust `packageExposed` for hidden packages
+--
 
 hp_2011_4_0_0 = [
     package "Cabal" "1.10.2.0"
