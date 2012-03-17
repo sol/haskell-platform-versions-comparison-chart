@@ -1,17 +1,28 @@
+{-# LANGUAGE OverloadedStrings, GeneralizedNewtypeDeriving #-}
 
+import Data.String
 
 data Platform = Platform {
-  platformName      :: String
+  platformName      :: PlatformVersion
 , platformPackages  :: [Package]
 }
 
+newtype PlatformVersion = PlatformVersion String
+  deriving IsString
+
+newtype PackageName= PackageName String
+  deriving IsString
+
+newtype PackageVersion = PackageVersion String
+  deriving IsString
+
 data Package = Package {
-  packageName    :: String
-, packageVersion :: String
+  packageName    :: PackageName
+, packageVersion :: PackageVersion
 , packageExposed :: Bool
 }
 
-package :: String -> String -> Package
+package :: PackageName -> PackageVersion -> Package
 package name version = Package name version True
 
 -- How to add a new release?
