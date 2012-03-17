@@ -27,10 +27,10 @@ hp_2011_4_0_0 = [
   , package "extensible-exceptions" "0.1.1.2"
   , package "ffi" "1.0"
   , package "filepath" "1.2.0.0"
-  , package "ghc" "7.0.4"
-  , package "ghc-binary" "0.5.0.2"
+  , Package "ghc" "7.0.4" False
+  , Package "ghc-binary" "0.5.0.2" False
   , package "ghc-prim" "0.2.0.0"
-  , package "haskell2010" "1.0.0.0"
+  , Package "haskell2010" "1.0.0.0" False
   , package "haskell98" "1.1.0.1"
   , package "hpc" "0.5.0.6"
   , package "integer-gmp" "0.2.0.3"
