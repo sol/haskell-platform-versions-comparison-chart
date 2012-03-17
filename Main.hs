@@ -1,20 +1,18 @@
-{-# LANGUAGE OverloadedStrings, GeneralizedNewtypeDeriving #-}
+import           Data.Foldable (forM_)
 
-import Data.String
+import           Data.Map   (Map)
+import qualified Data.Map as Map
 
 data Platform = Platform {
   platformVersion  :: PlatformVersion
 , platformPackages :: [Package]
 }
 
-newtype PlatformVersion = PlatformVersion String
-  deriving IsString
+type PlatformVersion = String
 
-newtype PackageName= PackageName String
-  deriving IsString
+type PackageName= String
 
-newtype PackageVersion = PackageVersion String
-  deriving IsString
+type PackageVersion = String
 
 data Package = Package {
   packageName    :: PackageName
@@ -22,8 +20,47 @@ data Package = Package {
 , packageExposed :: Bool
 }
 
+showPackageVersion :: Package -> String
+showPackageVersion (Package _ version exposed)
+  | exposed   = version
+  | otherwise = "(" ++ version ++ ")"
+
 package :: PackageName -> PackageVersion -> Package
 package name version = Package name version True
+
+packageIndex :: Map PackageName [(PlatformVersion, Package)]
+packageIndex = foldr f Map.empty releases
+  where
+    f (Platform version xs) m = foldr g m xs
+      where
+        g x@(Package name _ _) = Map.insertWith' (++) name [(version, x)]
+
+main :: IO ()
+main = do
+  putStrLn "<thead>"
+  putStrLn (tableHeader versions)
+  putStrLn "</thead><tbody>"
+  forM_ packageIndex $ \xs -> do
+    let name = (packageName . snd . head) xs
+    putStr "<tr>"
+    putStr (th name)
+
+    forM_ versions $ \v -> do
+      (putStr . td . maybe "" showPackageVersion) (lookup v xs)
+
+    putStrLn "</tr>"
+  putStrLn "</tbody>"
+  where
+    versions = map platformVersion releases
+
+tableHeader :: [String] -> String -- FIXME: use ShowS
+tableHeader xs = "<tr>" ++ th "" ++ concatMap th xs ++ "</tr>"
+
+th :: String -> String
+th x = "<th>" ++ x ++ "</th>"
+
+td :: String -> String
+td x = "<td>" ++ x ++ "</td>"
 
 -- | A list of Haskell Platform releases.
 --
