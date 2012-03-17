@@ -1,66 +1,78 @@
+{-# LANGUAGE OverloadedStrings #-}
+module Main (main) where
+import           Prelude hiding (div)
 import           Data.Foldable (forM_)
 
 import           Data.Map   (Map)
 import qualified Data.Map as Map
 
-data Platform = Platform {
-  platformVersion  :: PlatformVersion
-, platformPackages :: [Package]
-}
+import           Text.Blaze.Html5 hiding (head, map, style)
+import qualified Text.Blaze.Html5 as Html
+import           Text.Blaze.Renderer.String (renderHtml)
+import           Text.Blaze.Html5.Attributes hiding (title, name)
+
+type PackageName = String
+type PackageVersion = String
+data Visibility = Exposed | Hidden
+
+data Package = Package
+  PackageName
+  PackageVersion
+  Visibility
 
 type PlatformVersion = String
 
-type PackageName= String
+data Platform = Platform
+  PlatformVersion
+  [Package]
 
-type PackageVersion = String
 
-data Package = Package {
-  packageName    :: PackageName
-, packageVersion :: PackageVersion
-, packageExposed :: Bool
-}
-
-showPackageVersion :: Package -> String
-showPackageVersion (Package _ version exposed)
-  | exposed   = version
-  | otherwise = "(" ++ version ++ ")"
-
-package :: PackageName -> PackageVersion -> Package
-package name version = Package name version True
-
-packageIndex :: Map PackageName [(PlatformVersion, Package)]
-packageIndex = foldr f Map.empty releases
-  where
-    f (Platform version xs) m = foldr g m xs
-      where
-        g x@(Package name _ _) = Map.insertWith' (++) name [(version, x)]
+heading :: Html
+heading = "Haskell Platform Version Comparison Chart"
 
 main :: IO ()
-main = do
-  putStrLn "<thead>"
-  putStrLn (tableHeader versions)
-  putStrLn "</thead><tbody>"
-  forM_ packageIndex $ \xs -> do
-    let name = (packageName . snd . head) xs
-    putStr "<tr>"
-    putStr (th name)
+main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
+  Html.head $ do
+    meta ! charset "utf-8"
+    link ! rel "stylesheet" ! type_ "text/css" ! href "css/bootstrap.css"
+    title heading
 
-    forM_ versions $ \v -> do
-      (putStr . td . maybe "" showPackageVersion) (lookup v xs)
+  body . (div ! class_ "container" ! style "padding-top: 1em") $ do
+    h1 heading
+    blockquote . p $ do
+      em"Ever wanted to know what version of a package is in what Haskell Platform?"
+      br
+      em "Here you are!"
+    table ! class_ "table table-bordered" $ do
+      thead . tr $ do
+        th ""
+        mapM_ (th . toHtml) versions
+      tbody $ do
+        forM_ (Map.toList packageIndex) $ \(name, xs) -> tr $ do
+          th (toHtml name)
 
-    putStrLn "</tr>"
-  putStrLn "</tbody>"
+          forM_ versions $ \v -> do
+            (td . toHtml . maybe "" showPackageVersion) (lookup v xs)
   where
-    versions = map platformVersion releases
+    showPackageVersion :: Package -> String
+    showPackageVersion (Package _ version visibility) = case visibility of
+      Exposed -> version
+      Hidden  -> "(" ++ version ++ ")"
 
-tableHeader :: [String] -> String -- FIXME: use ShowS
-tableHeader xs = "<tr>" ++ th "" ++ concatMap th xs ++ "</tr>"
 
-th :: String -> String
-th x = "<th>" ++ x ++ "</th>"
+    packageIndex :: Map PackageName [(PlatformVersion, Package)]
+    packageIndex = foldr f Map.empty releases
+      where
+        f (Platform version xs) m = foldr g m xs
+          where
+            g x@(Package name _ _) = Map.insertWith' (++) name [(version, x)]
 
-td :: String -> String
-td x = "<td>" ++ x ++ "</td>"
+    versions :: [PlatformVersion]
+    versions = [v | Platform v _ <- releases]
+
+-- | Construct an exposed package.
+package :: PackageName -> PackageVersion -> Package
+package name version = Package name version Exposed
 
 -- | A list of Haskell Platform releases.
 --
@@ -91,10 +103,10 @@ hp_2011_4_0_0 = [
   , package "extensible-exceptions" "0.1.1.2"
   , package "ffi" "1.0"
   , package "filepath" "1.2.0.0"
-  , Package "ghc" "7.0.4" False
-  , Package "ghc-binary" "0.5.0.2" False
+  , Package "ghc" "7.0.4" Hidden
+  , Package "ghc-binary" "0.5.0.2" Hidden
   , package "ghc-prim" "0.2.0.0"
-  , Package "haskell2010" "1.0.0.0" False
+  , Package "haskell2010" "1.0.0.0" Hidden
   , package "haskell98" "1.1.0.1"
   , package "hpc" "0.5.0.6"
   , package "integer-gmp" "0.2.0.3"
@@ -145,10 +157,10 @@ hp_2011_2_0_1 = [
   , package "extensible-exceptions" "0.1.1.2"
   , package "ffi" "1.0"
   , package "filepath" "1.2.0.0"
-  , Package "ghc" "7.0.3" False
-  , Package "ghc-binary" "0.5.0.2" False
+  , Package "ghc" "7.0.3" Hidden
+  , Package "ghc-binary" "0.5.0.2" Hidden
   , package "ghc-prim" "0.2.0.0"
-  , Package "haskell2010" "1.0.0.0" False
+  , Package "haskell2010" "1.0.0.0" Hidden
   , package "haskell98" "1.1.0.1"
   , package "hpc" "0.5.0.6"
   , package "integer-gmp" "0.2.0.3"
@@ -199,10 +211,10 @@ hp_2011_2_0_0 = [
   , package "extensible-exceptions" "0.1.1.2"
   , package "ffi" "1.0"
   , package "filepath" "1.2.0.0"
-  , Package "ghc" "7.0.2" False
-  , Package "ghc-binary" "0.5.0.2" False
+  , Package "ghc" "7.0.2" Hidden
+  , Package "ghc-binary" "0.5.0.2" Hidden
   , package "ghc-prim" "0.2.0.0"
-  , Package "haskell2010" "1.0.0.0" False
+  , Package "haskell2010" "1.0.0.0" Hidden
   , package "haskell98" "1.1.0.1"
   , package "hpc" "0.5.0.6"
   , package "integer-gmp" "0.2.0.3"
@@ -251,17 +263,17 @@ hp_2010_2_0_0 = [
   , package "bytestring" "0.9.1.7"
   , package "containers" "0.3.0.0"
   , package "directory" "1.0.1.1"
-  , Package "dph-base" "0.4.0" False
-  , Package "dph-par" "0.4.0" False
-  , Package "dph-prim-interface" "0.4.0" False
-  , Package "dph-prim-par" "0.4.0" False
-  , Package "dph-prim-seq" "0.4.0" False
-  , Package "dph-seq" "0.4.0" False
+  , Package "dph-base" "0.4.0" Hidden
+  , Package "dph-par" "0.4.0" Hidden
+  , Package "dph-prim-interface" "0.4.0" Hidden
+  , Package "dph-prim-par" "0.4.0" Hidden
+  , Package "dph-prim-seq" "0.4.0" Hidden
+  , Package "dph-seq" "0.4.0" Hidden
   , package "extensible-exceptions" "0.1.1.1"
   , package "ffi" "1.0"
   , package "filepath" "1.1.0.4"
-  , Package "ghc" "6.12.3" False
-  , Package "ghc-binary" "0.5.0.2" False
+  , Package "ghc" "6.12.3" Hidden
+  , Package "ghc-binary" "0.5.0.2" Hidden
   , package "ghc-prim" "0.2.0.0"
   , package "haskell98" "1.0.1.1"
   , package "hpc" "0.5.0.5"
