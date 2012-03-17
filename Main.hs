@@ -3,8 +3,8 @@
 import Data.String
 
 data Platform = Platform {
-  platformName      :: PlatformVersion
-, platformPackages  :: [Package]
+  platformVersion  :: PlatformVersion
+, platformPackages :: [Package]
 }
 
 newtype PlatformVersion = PlatformVersion String
@@ -25,13 +25,24 @@ data Package = Package {
 package :: PackageName -> PackageVersion -> Package
 package name version = Package name version True
 
+-- | A list of Haskell Platform releases.
+--
 -- How to add a new release?
 --
 -- (1) ghc-pkg list
 -- (2) s/\(.*\)-\([^-]*\)$/  , package "\1" "\2"
 -- (3) manually adjust `packageExposed` for hidden packages
+-- (4) add to `releases`
 --
+releases :: [Platform]
+releases =
+  Platform "2011.4.0.0" hp_2011_4_0_0 :
+  Platform "2011.2.0.1" hp_2011_2_0_1 :
+  Platform "2011.2.0.0" hp_2011_2_0_0 :
+  Platform "2010.2.0.0" hp_2010_2_0_0 :
+  []
 
+hp_2011_4_0_0 :: [Package]
 hp_2011_4_0_0 = [
     package "Cabal" "1.10.2.0"
   , package "array" "0.3.0.2"
@@ -85,6 +96,7 @@ hp_2011_4_0_0 = [
   , package "zlib" "0.5.3.1"
   ]
 
+hp_2011_2_0_1 :: [Package]
 hp_2011_2_0_1 = [
     package "Cabal" "1.10.1.0"
   , package "array" "0.3.0.2"
@@ -138,6 +150,7 @@ hp_2011_2_0_1 = [
   , package "zlib" "0.5.3.1"
   ]
 
+hp_2011_2_0_0 :: [Package]
 hp_2011_2_0_0 = [
     package "Cabal" "1.10.1.0"
   , package "array" "0.3.0.2"
@@ -191,6 +204,7 @@ hp_2011_2_0_0 = [
   , package "zlib" "0.5.3.1"
   ]
 
+hp_2010_2_0_0 :: [Package]
 hp_2010_2_0_0 = [
     package "Cabal" "1.8.0.6"
   , package "array" "0.3.0.1"
