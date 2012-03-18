@@ -2,6 +2,7 @@
 module Main where
 import           Prelude hiding (div)
 import           Data.Foldable (forM_)
+import           Data.List (nub)
 
 import           Data.Map   (Map)
 import qualified Data.Map as Map
@@ -51,7 +52,7 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
         th ""
         mapM_ (th . toHtml) versions
       tbody $ do
-        forM_ (Map.toList packageIndex) $ \(name, xs) -> tr $ do
+        forM_ packages $ \(name, xs) -> tr $ do
           th (toHtml name)
 
           forM_ versions $ \v -> do
@@ -62,6 +63,19 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
       Exposed -> version
       Hidden  -> "(" ++ version ++ ")"
 
+    -- package names in the order they appear in the latest release
+    packageNamesLatest :: [PackageName]
+    packageNamesLatest = map packageName (platformGhcPackages latest ++ platformPackages latest)
+      where
+        latest = head releases
+
+    packagesLatest :: [(PackageName, [(PlatformVersion, Package)])]
+    packagesLatest = map (\name -> (name, packageIndex Map.! name)) packageNamesLatest
+
+    -- all packages, packages that are in the latest release first (keeping the
+    -- order they appear in the latest release)
+    packages :: [(PackageName, [(PlatformVersion, Package)])]
+    packages = nub (packagesLatest ++ Map.toList packageIndex)
 
     packageIndex :: Map PackageName [(PlatformVersion, Package)]
     packageIndex = foldr f Map.empty releases
