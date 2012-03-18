@@ -68,7 +68,7 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
           case (lookup v1 xs, lookup v2 xs) of
             (Nothing, _)       -> td ""
             (Just p1, Just p2) -> showPackageVersion (packageVersion p1 /= packageVersion p2) p1
-            (Just p1, Nothing) -> showPackageVersion True p1
+            (Just p1, Nothing) -> showPackageVersion False p1
           go (v2:vs)
         go (v:[])    = maybe (td "") (showPackageVersion False) (lookup v xs)
 
