@@ -55,6 +55,11 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
         forM_ packages $ \(name, xs) -> tr $ do
           th (toHtml name)
           showVersions xs
+    footer $ do
+      "brought to you by "
+      a ! href "https://github.com/sol" $ "Simon Hengel"
+      ", source on "
+      a ! href "https://github.com/sol/haskell-platform-version-comparison" $ "GitHub"
 
   where
     showVersions xs = go versions
