@@ -58,7 +58,7 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
       "brought to you by "
       a ! href "https://github.com/sol" $ "Simon Hengel"
       ", source on "
-      a ! href "https://github.com/sol/versions-comparison-chart" $ "GitHub"
+      a ! href "https://github.com/sol/haskell-platform-versions-comparison-chart" $ "GitHub"
 
   where
     showVersions xs = go versions
