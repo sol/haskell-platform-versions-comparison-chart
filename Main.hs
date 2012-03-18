@@ -54,14 +54,29 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
       tbody $ do
         forM_ packages $ \(name, xs) -> tr $ do
           th (toHtml name)
+          showVersions xs
 
-          forM_ versions $ \v -> do
-            (td . toHtml . maybe "" showPackageVersion) (lookup v xs)
   where
-    showPackageVersion :: Package -> String
-    showPackageVersion (Package _ version visibility) = case visibility of
-      Exposed -> version
-      Hidden  -> "(" ++ version ++ ")"
+    showVersions xs = go versions
+      where
+        go (v1:v2:vs) = do
+          case (lookup v1 xs, lookup v2 xs) of
+            (Nothing, _)       -> td ""
+            (Just p1, Just p2) -> showPackageVersion (packageVersion p1 /= packageVersion p2) p1
+            (Just p1, Nothing) -> showPackageVersion True p1
+          go (v2:vs)
+        go (v:[])    = maybe (td "") (showPackageVersion False) (lookup v xs)
+
+
+    showPackageVersion :: Bool -> Package -> Html
+    showPackageVersion changed (Package _ version visibility)
+      | changed   = (td . new . toHtml) s
+      | otherwise = (td . toHtml) s
+      where
+        new = Html.span ! class_ "alert-success"
+        s = case visibility of
+          Exposed -> version
+          Hidden  -> "(" ++ version ++ ")"
 
     -- package names in the order they appear in the latest release
     packageNamesLatest :: [PackageName]
