@@ -31,18 +31,17 @@ data Platform = Platform {
 , platformPackages    :: [Package]
 } deriving (Eq, Show)
 
-heading :: Html
-heading = "Haskell Platform Version Comparison Chart"
-
 main :: IO ()
 main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
   Html.head $ do
     meta ! charset "utf-8"
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/bootstrap.css"
-    title heading
+    title "Haskell Platform Versions Comparison Chart"
 
-  body . (div ! class_ "container" ! style "padding-top: 1em") $ do
-    h1 heading
+  body . (div ! class_ "container") $ do
+    div !class_ "page-header" $ h1 $ do
+      small "Haskell Platform "
+      "Versions Comparison Chart"
     blockquote . p $ do
       em "Ever wanted to know what version of a package is in what Haskell Platform?"
       br
