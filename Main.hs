@@ -1,19 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module Main where
 import           Prelude hiding (div)
 import           Data.Foldable (forM_)
-import           Data.List (nub)
+import           Data.List (sortBy)
+import           Data.Char (toLower)
+import           Data.Function (on)
 
-import           Data.Map   (Map)
 import qualified Data.Map as Map
 
 import           Text.Blaze.Html5 hiding (head, map, style)
 import qualified Text.Blaze.Html5 as Html
 import           Text.Blaze.Renderer.String (renderHtml)
-import           Text.Blaze.Html5.Attributes hiding (title, name)
+import           Text.Blaze.Html5.Attributes hiding (title, name, id)
 
 type PackageName = String
+
 type PackageVersion = String
+
 data Visibility = Exposed | Hidden
   deriving (Eq, Show)
 
@@ -31,11 +35,16 @@ data Platform = Platform {
 , platformPackages    :: [Package]
 } deriving (Eq, Show)
 
+-- intermediate data structures, used for processing
+data PackageOrigin = PlatformPackage | GhcBootPackage
+  deriving (Eq, Show)
+
 main :: IO ()
 main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
   Html.head $ do
     meta ! charset "utf-8"
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/bootstrap.css"
+    link ! rel "stylesheet" ! type_ "text/css" ! href "css/custom.css"
     title "Haskell Platform Versions Comparison Chart"
 
   body . (div ! class_ "container") $ do
@@ -61,47 +70,41 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
       a ! href "https://github.com/sol/haskell-platform-versions-comparison-chart" $ "GitHub"
 
   where
+    showVersions :: [(PlatformVersion, (PackageOrigin, Package))] -> Html
     showVersions xs = go versions
       where
         go (v1:v2:vs) = do
           case (lookup v1 xs, lookup v2 xs) of
             (Nothing, _)       -> td ""
-            (Just p1, Just p2) -> showPackageVersion (packageVersion p1 /= packageVersion p2) p1
+            (Just p1, Just p2) -> showPackageVersion ((packageVersion . snd) p1 /= (packageVersion . snd) p2) p1
             (Just p1, Nothing) -> showPackageVersion False p1
           go (v2:vs)
         go (v:[])    = maybe (td "") (showPackageVersion False) (lookup v xs)
+        go []        = return ()
 
 
-    showPackageVersion :: Bool -> Package -> Html
-    showPackageVersion changed (Package _ version visibility)
-      | changed   = (td . new . toHtml) s
-      | otherwise = (td . toHtml) s
+    showPackageVersion :: Bool -> (PackageOrigin, Package) -> Html
+    showPackageVersion changed (origin, Package _ version visibility) =
+      (td . new . ghc . toHtml) s
       where
-        new = Html.span ! class_ "alert-success"
         s = case visibility of
           Exposed -> version
           Hidden  -> "(" ++ version ++ ")"
 
-    -- package names in the order they appear in the latest release
-    packageNamesLatest :: [PackageName]
-    packageNamesLatest = map packageName (platformGhcPackages latest ++ platformPackages latest)
+        ghc = case origin of
+          GhcBootPackage  -> Html.span ! class_ "ghc-boot"
+          PlatformPackage -> id
+
+        new
+          | changed   = Html.span ! class_ "alert-success"
+          | otherwise = id
+
+    packages :: [(PackageName, [(PlatformVersion, (PackageOrigin, Package))])]
+    packages = sortBy (compare `on` (map toLower . fst)) $ Map.toList $ foldr f Map.empty releases
       where
-        latest = head releases
-
-    packagesLatest :: [(PackageName, [(PlatformVersion, Package)])]
-    packagesLatest = map (\name -> (name, packageIndex Map.! name)) packageNamesLatest
-
-    -- all packages, packages that are in the latest release first (keeping the
-    -- order they appear in the latest release)
-    packages :: [(PackageName, [(PlatformVersion, Package)])]
-    packages = nub (packagesLatest ++ Map.toList packageIndex)
-
-    packageIndex :: Map PackageName [(PlatformVersion, Package)]
-    packageIndex = foldr f Map.empty releases
-      where
-        f (Platform version xs ys) m = foldr g m (xs ++ ys)
+        f (Platform version xs ys) m = foldr g m (map (\x -> (GhcBootPackage, x)) xs ++ map (\x -> (PlatformPackage, x)) ys)
           where
-            g x@(Package name _ _) = Map.insertWith' (++) name [(version, x)]
+            g x@(_, Package name _ _) = Map.insertWith' (++) name [(version, x)]
 
     versions :: [PlatformVersion]
     versions = [v | Platform v _ _ <- releases]
