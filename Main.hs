@@ -13,6 +13,7 @@ import           Text.Blaze.Html5 hiding (head, map, style)
 import qualified Text.Blaze.Html5 as Html
 import           Text.Blaze.Renderer.String (renderHtml)
 import           Text.Blaze.Html5.Attributes hiding (title, name, id)
+import qualified Text.Blaze.Html5.Attributes as A
 
 type PackageName = String
 
@@ -45,6 +46,11 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
     meta ! charset "utf-8"
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/bootstrap.css"
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/custom.css"
+
+    script ! type_ "text/javascript" ! src "js/jquery.js" $ ""
+    script ! type_ "text/javascript" ! src "js/bootstrap.js" $ ""
+    script ! type_ "text/javascript" ! src "js/custom.js" $ ""
+
     title "Haskell Platform Versions Comparison Chart"
 
   body . (div ! class_ "container") $ do
@@ -92,7 +98,7 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
           Hidden  -> "(" ++ version ++ ")"
 
         ghc = case origin of
-          GhcBootPackage  -> Html.span ! class_ "ghc-boot"
+          GhcBootPackage  -> Html.span ! class_ "ghc-boot" ! A.title "comes with ghc"
           PlatformPackage -> id
 
         new
