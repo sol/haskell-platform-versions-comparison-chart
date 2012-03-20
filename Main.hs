@@ -47,10 +47,6 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/bootstrap.css"
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/custom.css"
 
-    script ! type_ "text/javascript" ! src "js/jquery.js" $ ""
-    script ! type_ "text/javascript" ! src "js/bootstrap.js" $ ""
-    script ! type_ "text/javascript" ! src "js/custom.js" $ ""
-
     title "Haskell Platform Versions Comparison Chart"
 
   body . (div ! class_ "container") $ do
@@ -69,11 +65,21 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
         forM_ packages $ \(name, xs) -> tr $ do
           th (toHtml name)
           showVersions xs
+    div ! class_ "legend" $ do
+      Html.span ! class_ "alert-success" $ "new version"
+      ", "
+      "*comes with ghc"
+
     footer $ do
       "brought to you by "
       a ! href "https://github.com/sol" $ "Simon Hengel"
       ", source on "
       a ! href "https://github.com/sol/haskell-platform-versions-comparison-chart" $ "GitHub"
+
+    -- script ! type_ "text/javascript" ! src "js/jquery.js" $ ""
+    -- script ! type_ "text/javascript" ! src "js/bootstrap.js" $ ""
+    -- script ! type_ "text/javascript" ! src "js/custom.js" $ ""
+
 
   where
     showVersions :: [(PlatformVersion, (PackageOrigin, Package))] -> Html
@@ -98,7 +104,7 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
           Hidden  -> "(" ++ version ++ ")"
 
         ghc = case origin of
-          GhcBootPackage  -> Html.span ! class_ "ghc-boot" ! A.title "comes with ghc"
+          GhcBootPackage  -> (Html.span ! class_ "ghc-boot" {- ! A.title "comes with ghc" -}) . (>> "*")
           PlatformPackage -> id
 
         new
