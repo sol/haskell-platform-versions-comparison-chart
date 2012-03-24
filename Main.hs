@@ -6,14 +6,14 @@ import           Data.Foldable (forM_)
 import           Data.List (sortBy)
 import           Data.Char (toLower)
 import           Data.Function (on)
+import           Data.String
 
 import qualified Data.Map as Map
 
-import           Text.Blaze.Html5 hiding (head, map, style)
+import           Text.Blaze.Html5 hiding (p, head, map, style)
 import qualified Text.Blaze.Html5 as Html
 import           Text.Blaze.Renderer.String (renderHtml)
 import           Text.Blaze.Html5.Attributes hiding (title, name, id)
-import qualified Text.Blaze.Html5.Attributes as A
 
 type PackageName = String
 
@@ -53,7 +53,7 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
     div !class_ "page-header" $ h1 $ do
       small "Haskell Platform "
       "Versions Comparison Chart"
-    blockquote . p $ do
+    blockquote . Html.p $ do
       em "Ever wanted to know what version of a package is in what Haskell Platform?"
       br
       em "Here you are!"
@@ -110,12 +110,12 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
 
 
     showPackageVersion :: Bool -> (PackageOrigin, Package) -> Html
-    showPackageVersion changed (origin, Package _ version visibility) =
-      (td . new . ghc . toHtml) s
+    showPackageVersion changed (origin, p) =
+      (td . new . ghc) s
       where
-        s = case visibility of
-          Exposed -> version
-          Hidden  -> "(" ++ version ++ ")"
+        s = case packageVisibility p of
+          Exposed -> createDocLink p
+          Hidden  -> "(" >> createDocLink p >> ")"
 
         ghc = case origin of
           GhcBootPackage  -> (Html.span ! class_ "ghc-boot" {- ! A.title "comes with ghc" -}) . (>> "*")
@@ -124,6 +124,16 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
         new
           | changed   = Html.span ! class_ "alert-success"
           | otherwise = id
+
+    -- | Create link to package documentation.
+    createDocLink :: Package -> Html
+    createDocLink p
+      -- for now, we only care about ghc
+      | name == "ghc" = a ! href (fromString ghcDoc) $ toHtml version
+      | otherwise     = toHtml version
+      where
+        Package name version _ = p
+        ghcDoc = "http://www.haskell.org/ghc/docs/" ++ version ++ "/html/libraries/ghc-" ++ version ++ "/index.html"
 
     packages :: [(PackageName, [(PlatformVersion, (PackageOrigin, Package))])]
     packages = sortBy (compare `on` (map toLower . fst)) $ Map.toList $ foldr f Map.empty releases
