@@ -37,8 +37,10 @@ platform
   -> Platform
 platform version ghcVersion ghc hp = Platform version $ addGhcVersion ghc ++ addNothing hp
   where
-    addGhcVersion = map ($ Just ghcVersion)
+    addGhcVersion = ghcPackages ghcVersion
     addNothing    = map ($ Nothing)
+
+ghcPackages version = map ($ Just version)
 
 -- | A list of Haskell Platform releases.
 --
@@ -93,7 +95,7 @@ uninterestingPackages = [
   , "haskell-platform"
   ]
 
-ghc_latest = [
+ghc_latest = ghcPackages "7.4.1" [
     package "Cabal" "1.14.0"
   , package "array" "0.4.0.0"
   , package "base" "4.5.0.0"

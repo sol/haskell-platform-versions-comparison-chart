@@ -5,10 +5,11 @@ module Layout (chart) where
 import           Prelude hiding (div)
 import           Control.Monad (when)
 import           Data.Foldable (forM_)
-import           Data.List (sortBy)
+import           Data.List (sortBy, find)
 import           Data.Char (toLower)
 import           Data.Function (on)
 import           Data.String
+import           Data.Monoid (mempty)
 
 import qualified Data.Map as Map
 
@@ -102,13 +103,22 @@ packageLink :: Package -> Html
 packageLink (Package name version _ mGhcVersion) = a ! href (fromString url) $ toHtml version
   where
     url
-      | (not . isPlatformPackage) name, Just v <- mGhcVersion
-                   = "http://www.haskell.org/ghc/docs/" ++ v ++ "/html/libraries/" ++ name ++ "-" ++ version ++ "/index.html"
+      | (not . isPlatformPackage) name, Just ghc <- mGhcVersion
+                   = ghcDocUrl ghc name version
       | otherwise  = "http://hackage.haskell.org/package/" ++ name ++ "-" ++ version
+
+
+-- | Construct URL to documentation of ghc package.
+ghcDocUrl :: GhcVersion -> PackageName -> PackageVersion -> String
+ghcDocUrl ghc name version = "http://www.haskell.org/ghc/docs/" ++ ghc ++ "/html/libraries/" ++ name ++ "-" ++ version ++ "/index.html"
 
 -- | Create link to latest documentation.
 packageLatest :: PackageName -> Html
-packageLatest name = a ! href (fromString url) $ "???"
+packageLatest name
+  | (not . isPlatformPackage) name = case find ((== name) . packageName) ghc_latest of
+                Just (Package _ v _ (Just ghc)) -> a ! href (fromString $ ghcDocUrl ghc name v) $ toHtml v
+                _                               -> mempty
+  | otherwise = a ! href (fromString url) $ "???"
   where
     url = "http://hackage.haskell.org/package/" ++ name
 
