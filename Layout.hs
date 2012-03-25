@@ -44,7 +44,8 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       tbody $ do
         forM_ packages $ \(name, xs) -> tr $ do
           th (toHtml name)
-          td ! dataAttribute "package" (fromString name) ! class_ "hackage-version" $ ""
+          td ! dataAttribute "package" (fromString name) ! class_ "hackage-version" $ do
+            packageLatest name
           showVersions xs
 
     forkMe "https://github.com/sol/haskell-platform-versions-comparison-chart"
@@ -63,35 +64,24 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
         go (v1:v2:vs) = do
           case (lookup v1 xs, lookup v2 xs) of
             (Nothing, _)       -> td ""
-            (Just p1, Just p2) -> showPackageVersion (packageVersion p1 /= packageVersion p2) p1
-            (Just p1, Nothing) -> showPackageVersion False p1
+            (Just p1, Just p2) -> showPackage (packageVersion p1 /= packageVersion p2) p1
+            (Just p1, Nothing) -> showPackage False p1
           go (v2:vs)
-        go (v:[])    = maybe (td "") (showPackageVersion False) (lookup v xs)
+        go (v:[])    = maybe (td "") (showPackage False) (lookup v xs)
         go []        = return ()
 
-
-    showPackageVersion :: Bool -> Package -> Html
-    showPackageVersion changed p@(Package _ version visibility) =
+    showPackage :: Bool -> Package -> Html
+    showPackage changed p@(Package _ version visibility) =
       (cell . new) s
       where
         cell = td ! dataAttribute "version" (fromString version)
 
         s = case visibility of
-          Exposed -> createDocLink p
-          Hidden  -> "(" >> createDocLink p >> ")"
+          Exposed -> packageLink p
+          Hidden  -> "(" >> packageLink p >> ")"
         new
-          | changed   = Html.span ! class_ "alert-success"
+          | changed   = (! class_ "alert-success")
           | otherwise = id
-
-    -- | Create link to package documentation.
-    createDocLink :: Package -> Html
-    createDocLink p
-      -- for now, we only care about ghc
-      | name == "ghc" = a ! href (fromString ghcDoc) $ toHtml version
-      | otherwise     = toHtml version
-      where
-        Package name version _ = p
-        ghcDoc = "http://www.haskell.org/ghc/docs/" ++ version ++ "/html/libraries/ghc-" ++ version ++ "/index.html"
 
     -- group packages by package name
     packages :: [(PackageName, [(PlatformVersion, Package)])]
@@ -109,6 +99,20 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
     versions :: [PlatformVersion]
     versions = [v | Platform v _ _ <- releases]
+
+-- | Create link to package documentation.
+packageLink :: Package -> Html
+packageLink (Package name version _) = a ! href (fromString url) $ toHtml version
+  where
+    url
+      | name == "ghc" = "http://www.haskell.org/ghc/docs/" ++ version ++ "/html/libraries/ghc-" ++ version ++ "/index.html"
+      | otherwise     = "http://hackage.haskell.org/package/" ++ name ++ "-" ++ version
+
+-- | Create link to latest documentation.
+packageLatest :: PackageName -> Html
+packageLatest name = a ! href (fromString url) $ "???"
+  where
+    url = "http://hackage.haskell.org/package/" ++ name
 
 -- | Create a "Fork me on GitHub" link.
 forkMe :: AttributeValue -> Html

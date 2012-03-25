@@ -1,3 +1,11 @@
 td {
   width: 15%;
 }
+
+a {
+  color: inherit;
+}
+
+.alert-success {
+  color: inherit;
+}
