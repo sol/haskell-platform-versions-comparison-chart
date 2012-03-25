@@ -43,9 +43,6 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       "The latest package versions on Hackage will only be shown if you "
       a ! href "http://enable-javascript.com/" $
         "enable JavaScript"
-      ", and if your Browser supports "
-      a ! href "http://en.wikipedia.org/wiki/Cross-origin_resource_sharing" $
-        "cross-origin resource sharing"
       "."
 
     table ! class_ "table table-bordered" $ do
