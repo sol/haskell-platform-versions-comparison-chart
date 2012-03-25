@@ -21,6 +21,7 @@ type PlatformVersion = String
 
 data Platform = Platform {
   platformVersion     :: PlatformVersion
+, platformGhcVersion  :: GhcVersion
 , platformPackages    :: [Package]
 } deriving (Eq, Show)
 
@@ -35,7 +36,7 @@ platform
   -> [Maybe GhcVersion -> Package]
   -> [Maybe GhcVersion -> Package]
   -> Platform
-platform version ghcVersion ghc hp = Platform version $ addGhcVersion ghc ++ addNothing hp
+platform version ghcVersion ghc hp = Platform version ghcVersion $ addGhcVersion ghc ++ addNothing hp
   where
     addGhcVersion = ghcPackages ghcVersion
     addNothing    = map ($ Nothing)

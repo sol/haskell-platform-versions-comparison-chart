@@ -43,7 +43,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       thead . tr $ do
         th ""
         th ! class_ "latest" $ "Hackage"
-        mapM_ (th . platformLink) versions
+        mapM_ (th . platformLink) (map fst versions)
 
       tbody $ do
         forM_ packages $ \(name, xs) -> when (isPlatformPackage name) . tr $ do
@@ -63,7 +63,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
     load s = script ! src s $ ""
 
     showVersions :: [(PlatformVersion, Package)] -> Html
-    showVersions xs = go versions
+    showVersions xs = go (map fst versions)
       where
         go (v1:v2:vs) = do
           case (lookup v1 xs, lookup v2 xs) of
@@ -86,7 +86,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
     packages :: [(PackageName, [(PlatformVersion, Package)])]
     packages =  (sortCI . ignoreUninteresting . Map.toList . foldr f Map.empty) releases
       where
-        f (Platform version xs) m = foldr g m xs
+        f (Platform version _ xs) m = foldr g m xs
           where
             g x@(Package name _ _ _) = Map.insertWith' (++) name [(version, x)]
 
@@ -95,8 +95,8 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
         ignoreUninteresting = filter ((`notElem` uninterestingPackages) . fst)
 
-    versions :: [PlatformVersion]
-    versions = [v | Platform v _ <- releases]
+    versions :: [(PlatformVersion, GhcVersion)]
+    versions = [(v, ghc) | Platform v ghc _ <- releases]
 
 -- | Create link to package documentation.
 packageLink :: Package -> Html
