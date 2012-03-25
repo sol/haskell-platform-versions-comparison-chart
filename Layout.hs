@@ -74,14 +74,9 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
         go []        = return ()
 
     showPackage :: Bool -> Package -> Html
-    showPackage changed p@(Package _ version visibility) =
-      (cell . new) s
+    showPackage changed p@(Package _ version visibility) = (cell . new . packageLink) p
       where
         cell = td ! dataAttribute "version" (fromString version)
-
-        s = case visibility of
-          Exposed -> packageLink p
-          Hidden  -> "(" >> packageLink p >> ")"
         new
           | changed   = (! class_ "alert-success")
           | otherwise = id
@@ -110,11 +105,8 @@ packageLink (Package name version _) = a ! href (fromString url) $ toHtml versio
 
 -- | Create link to latest documentation.
 packageLatest :: PackageName -> Html
-packageLatest name = setVisibility (a ! href (fromString url) $ "???")
+packageLatest name = a ! href (fromString url) $ "???"
   where
-    setVisibility x
-      | name == "haskell2010" = "(" >> x >> ")"
-      | otherwise             = x
     url = "http://hackage.haskell.org/package/" ++ name
 
 -- | Create link to platform cabal file.
