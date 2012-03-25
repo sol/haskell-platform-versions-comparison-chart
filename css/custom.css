@@ -2,10 +2,10 @@ td {
   width: 15%;
 }
 
-a {
+table a {
   color: inherit;
 }
 
-.alert-success {
+table .alert-success {
   color: inherit;
 }

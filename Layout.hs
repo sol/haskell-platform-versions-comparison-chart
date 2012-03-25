@@ -38,7 +38,18 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       em "Ever wanted to know what version of a package is in what Haskell Platform?"
       br
       em "Here you are!"
+
     table ! class_ "table table-bordered" $ do
+      h2 "Platform Libraries"
+
+      Html.p $ do
+        "The "
+        hp
+        " is the blessed set of libraries and tools on"
+        " which to build further Haskell libraries and applications.  It is"
+        " intended to provide a comprehensive, stable, and quality tested base for"
+        " Haskell projects to work from."
+
 
       thead . tr $ do
         th ""
@@ -52,6 +63,25 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
             packageLatest name
           showVersions xs
 
+
+    table ! class_ "table table-bordered" $ do
+      h2 "GHC Libraries"
+      Html.p $ do
+        " GHC provides additional libraries which are not part of the "
+        hp
+        "."
+      thead . tr $ do
+        th ""
+        th "Latest"
+        mapM_ (th . toHtml) (map snd versions)
+
+      tbody $ do
+        forM_ packages $ \(name, xs) -> when (not . isPlatformPackage $ name) . tr $ do
+          th (toHtml name)
+          td ! dataAttribute "package" (fromString name) ! class_ "latest" $ do
+            packageLatest name
+          showVersions xs
+
     forkMe "https://github.com/sol/haskell-platform-versions-comparison-chart"
 
     load "js/jquery.js"
@@ -60,6 +90,8 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
     load "js/custom.js"
 
   where
+    hp = a ! href "http://hackage.haskell.org/platform/" $ "Haskell Platform"
+
     load s = script ! src s $ ""
 
     showVersions :: [(PlatformVersion, Package)] -> Html

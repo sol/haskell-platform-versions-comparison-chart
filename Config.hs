@@ -76,7 +76,8 @@ isPlatformPackage p = notElem p $ [
   , "ghc-prim"
   , "haskell-platform"
   , "integer-gmp"
-  ] ++ uninterestingPackages
+  , "rts"
+  ]
 
 uninterestingPackages = [
   -- only included with ghc-6.12.3 (and maybe before?)
@@ -87,7 +88,7 @@ uninterestingPackages = [
   , "dph-prim-seq"
   , "dph-seq"
 
-  -- only documented with ghc-6.12.3 (and maybe before?)
+  -- does not export anything for ghc 7.0.*
   , "integer-gmp"
 
   -- the following packages do not provide any modules
