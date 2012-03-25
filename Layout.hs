@@ -41,7 +41,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       thead . tr $ do
         th ""
         th ! class_ "latest" $ "Hackage"
-        mapM_ (th . toHtml) versions
+        mapM_ (th . platformLink) versions
 
       tbody $ do
         forM_ packages $ \(name, xs) -> tr $ do
@@ -115,6 +115,12 @@ packageLatest :: PackageName -> Html
 packageLatest name = a ! href (fromString url) $ "???"
   where
     url = "http://hackage.haskell.org/package/" ++ name
+
+-- | Create link to platform cabal file.
+platformLink :: PlatformVersion -> Html
+platformLink version = a ! href (fromString url) $ toHtml version
+  where
+    url = "https://raw.github.com/sol/haskell-platform-versions-comparison-chart/gh-pages/cabal/" ++ version ++ "/haskell-platform.cabal"
 
 -- | Create a "Fork me on GitHub" link.
 forkMe :: AttributeValue -> Html
