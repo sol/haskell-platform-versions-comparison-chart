@@ -15,6 +15,8 @@ import qualified Text.Blaze.Html5 as Html
 import           Text.Blaze.Renderer.String (renderHtml)
 import           Text.Blaze.Html5.Attributes hiding (title, name, id)
 
+import           Util
+
 type PackageName = String
 
 type PackageVersion = String
@@ -72,32 +74,11 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
       ", "
       "*comes with ghc"
 
-    a ! href "https://github.com/sol/haskell-platform-versions-comparison-chart" $ do
-      img ! style "position: absolute; top: 0; right: 0; border: 0;"
-
-          -- red
-          -- ! src "https://a248.e.akamai.net/assets.github.com/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67"
-
-          -- green
-          -- ! src "https://a248.e.akamai.net/assets.github.com/img/abad93f42020b733148435e2cd92ce15c542d320/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67"
-
-          -- black
-          -- ! src "https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
-
-          -- orange
-          ! src "https://a248.e.akamai.net/assets.github.com/img/30f550e0d38ceb6ef5b81500c64d970b7fb0f028/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
-
-          -- gray
-          -- ! src "https://a248.e.akamai.net/assets.github.com/img/71eeaab9d563c2b3c590319b398dd35683265e85/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67"
-
-          ! alt "Fork me on GitHub"
+    forkMe "https://github.com/sol/haskell-platform-versions-comparison-chart"
 
     load "js/jquery.js"
     -- load "js/bootstrap.js"
-
-    -- from https://github.com/neteye/jquery-plugins
-    load "js/activity-indicator.js"
-
+    load "js/activity-indicator.js" -- from https://github.com/neteye/jquery-plugins
     load "js/custom.js"
 
   where
