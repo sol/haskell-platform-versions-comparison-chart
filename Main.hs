@@ -60,10 +60,12 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
     table ! class_ "table table-bordered" $ do
       thead . tr $ do
         th ""
+        th ! class_ "hackage-header" $ "Hackage"
         mapM_ (th . toHtml) versions
       tbody $ do
         forM_ packages $ \(name, xs) -> tr $ do
           th (toHtml name)
+          td ! dataAttribute "package" (fromString name) ! class_ "hackage-version" $ ""
           showVersions xs
     div ! class_ "legend" $ do
       Html.span ! class_ "alert-success" $ "new version"
@@ -90,12 +92,17 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
 
           ! alt "Fork me on GitHub"
 
-    -- script ! type_ "text/javascript" ! src "js/jquery.js" $ ""
-    -- script ! type_ "text/javascript" ! src "js/bootstrap.js" $ ""
-    -- script ! type_ "text/javascript" ! src "js/custom.js" $ ""
+    load "js/jquery.js"
+    -- load "js/bootstrap.js"
 
+    -- from https://github.com/neteye/jquery-plugins
+    load "js/activity-indicator.js"
+
+    load "js/custom.js"
 
   where
+    load s = script ! src s $ ""
+
     showVersions :: [(PlatformVersion, (PackageOrigin, Package))] -> Html
     showVersions xs = go versions
       where
