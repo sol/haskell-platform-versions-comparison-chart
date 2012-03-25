@@ -90,7 +90,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
     forkMe "https://github.com/sol/haskell-platform-versions-comparison-chart"
 
-    load "js/jquery.js"
+    load "http://code.jquery.com/jquery-1.7.2.min.js"
     -- load "js/bootstrap.js"
     load "js/activity-indicator.js" -- from https://github.com/neteye/jquery-plugins
     load "js/custom.js"
