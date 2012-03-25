@@ -38,10 +38,6 @@ data Platform = Platform {
 , platformPackages    :: [Package]
 } deriving (Eq, Show)
 
--- intermediate data structures, used for processing
-data PackageOrigin = PlatformPackage | GhcBootPackage
-  deriving (Eq, Show)
-
 main :: IO ()
 main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
   Html.head $ do
@@ -69,10 +65,6 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
           th (toHtml name)
           td ! dataAttribute "package" (fromString name) ! class_ "hackage-version" $ ""
           showVersions xs
-    div ! class_ "legend" $ do
-      Html.span ! class_ "alert-success" $ "new version"
-      ", "
-      "*comes with ghc"
 
     forkMe "https://github.com/sol/haskell-platform-versions-comparison-chart"
 
@@ -84,31 +76,26 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
   where
     load s = script ! src s $ ""
 
-    showVersions :: [(PlatformVersion, (PackageOrigin, Package))] -> Html
+    showVersions :: [(PlatformVersion, Package)] -> Html
     showVersions xs = go versions
       where
         go (v1:v2:vs) = do
           case (lookup v1 xs, lookup v2 xs) of
             (Nothing, _)       -> td ""
-            (Just p1, Just p2) -> showPackageVersion ((packageVersion . snd) p1 /= (packageVersion . snd) p2) p1
+            (Just p1, Just p2) -> showPackageVersion (packageVersion p1 /= packageVersion p2) p1
             (Just p1, Nothing) -> showPackageVersion False p1
           go (v2:vs)
         go (v:[])    = maybe (td "") (showPackageVersion False) (lookup v xs)
         go []        = return ()
 
 
-    showPackageVersion :: Bool -> (PackageOrigin, Package) -> Html
-    showPackageVersion changed (origin, p) =
-      (td . new . ghc) s
+    showPackageVersion :: Bool -> Package -> Html
+    showPackageVersion changed p =
+      (td . new) s
       where
         s = case packageVisibility p of
           Exposed -> createDocLink p
           Hidden  -> "(" >> createDocLink p >> ")"
-
-        ghc = case origin of
-          GhcBootPackage  -> (Html.span ! class_ "ghc-boot" {- ! A.title "comes with ghc" -}) . (>> "*")
-          PlatformPackage -> id
-
         new
           | changed   = Html.span ! class_ "alert-success"
           | otherwise = id
@@ -123,12 +110,13 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
         Package name version _ = p
         ghcDoc = "http://www.haskell.org/ghc/docs/" ++ version ++ "/html/libraries/ghc-" ++ version ++ "/index.html"
 
-    packages :: [(PackageName, [(PlatformVersion, (PackageOrigin, Package))])]
-    packages = sortBy (compare `on` (map toLower . fst)) $ Map.toList $ foldr f Map.empty releases
+    -- FIXME: cleanup
+    packages :: [(PackageName, [(PlatformVersion, Package)])]
+    packages =  filter ((`notElem` non_api_packages) . fst) . sortBy (compare `on` (map toLower . fst)) $ Map.toList $ foldr f Map.empty releases
       where
-        f (Platform version xs ys) m = foldr g m (map (\x -> (GhcBootPackage, x)) xs ++ map (\x -> (PlatformPackage, x)) ys)
+        f (Platform version xs ys) m = foldr g m (map (\x -> x) xs ++ map (\x -> x) ys)
           where
-            g x@(_, Package name _ _) = Map.insertWith' (++) name [(version, x)]
+            g x@(Package name _ _) = Map.insertWith' (++) name [(version, x)]
 
     versions :: [PlatformVersion]
     versions = [v | Platform v _ _ <- releases]
@@ -153,6 +141,24 @@ releases =
   Platform "2011.2.0.0" ghc_7_0_2  hp_2011_2_0_0 :
   Platform "2010.2.0.0" ghc_6_12_3 hp_2010_2_0_0 :
   []
+
+non_api_packages :: [PackageName]
+non_api_packages = [
+    "bin-package-db"
+  , "dph-base"
+  , "dph-par"
+  , "dph-prim-interface"
+  , "dph-prim-par"
+  , "dph-prim-seq"
+  , "dph-seq"
+  , "ffi"
+  , "ghc"
+  , "ghc-binary"
+  , "ghc-prim"
+  , "haskell-platform"
+  , "integer-gmp"
+  , "rts"
+  ]
 
 ghc_7_0_4 :: [Package]
 ghc_7_0_4 = [

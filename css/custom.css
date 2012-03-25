@@ -1,18 +1,3 @@
-
-span.ghc-boot {
-  /* color: #999999; */
-}
-
-.table {
-  /* This is set to 18px by bootstrap.css.  We set it to 0px and instead put it
-   * on the legend.  That way the legend appear right under the table. */
-  margin-bottom: 0px;
-}
-.legend {
-  text-align: right;
-  margin-bottom: 18px;
-}
-
 td {
   width: 15%;
 }
