@@ -99,11 +99,12 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
 -- | Create link to package documentation.
 packageLink :: Package -> Html
-packageLink (Package name version _ _) = a ! href (fromString url) $ toHtml version
+packageLink (Package name version _ mGhcVersion) = a ! href (fromString url) $ toHtml version
   where
     url
-      | name == "ghc" = "http://www.haskell.org/ghc/docs/" ++ version ++ "/html/libraries/ghc-" ++ version ++ "/index.html"
-      | otherwise     = "http://hackage.haskell.org/package/" ++ name ++ "-" ++ version
+      | (not . isPlatformPackage) name, Just v <- mGhcVersion
+                   = "http://www.haskell.org/ghc/docs/" ++ v ++ "/html/libraries/" ++ name ++ "-" ++ version ++ "/index.html"
+      | otherwise  = "http://hackage.haskell.org/package/" ++ name ++ "-" ++ version
 
 -- | Create link to latest documentation.
 packageLatest :: PackageName -> Html
