@@ -45,7 +45,7 @@ platform version ghcVersion ghc hp = Platform version $ addGhcVersion ghc ++ add
 -- How to add a new release?
 --
 -- (1) ghc-pkg list
--- (2) s/\(.*\)-\([^-]*\)$/  , package "\1" "\2"
+-- (2) s/\s*\(.*\)-\([^-]*\)$/  , package "\1" "\2"
 -- (3) manually adjust `packageExposed` for hidden packages
 -- (4) add to `releases`
 --
@@ -91,6 +91,35 @@ uninterestingPackages = [
   , "rts"
   , "ffi"
   , "haskell-platform"
+  ]
+
+ghc_latest = [
+    package "Cabal" "1.14.0"
+  , package "array" "0.4.0.0"
+  , package "base" "4.5.0.0"
+  , package "bin-package-db" "0.0.0.0"
+  , package "binary" "0.5.1.0"
+  , package "bytestring" "0.9.2.1"
+  , package "containers" "0.4.2.1"
+  , package "deepseq" "1.3.0.0"
+  , package "directory" "1.1.0.2"
+  , package "extensible-exceptions" "0.1.1.4"
+  , package "filepath" "1.3.0.0"
+  , Package "ghc" "7.4.1" Hidden
+  , package "ghc-prim" "0.2.0.0"
+  , Package "haskell2010" "1.1.0.1" Hidden
+  , Package "haskell98" "2.0.0.1" Hidden
+  , package "hoopl" "3.8.7.3"
+  , package "hpc" "0.5.1.1"
+  , package "integer-gmp" "0.4.0.0"
+  , package "old-locale" "1.0.0.4"
+  , package "old-time" "1.1.0.0"
+  , package "pretty" "1.1.1.0"
+  , package "process" "1.1.0.1"
+  , package "rts" "1.0"
+  , package "template-haskell" "2.7.0.0"
+  , package "time" "1.4"
+  , package "unix" "2.5.1.0"
   ]
 
 ghc_7_0_4 = [
