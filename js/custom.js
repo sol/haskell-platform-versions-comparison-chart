@@ -9,14 +9,14 @@ $(document).ready(function() {
 function loadLatest() {
 
   // enable activity indicator
-  $('.hackage-header').activity({segments: 8, width: 2, space: 0, length: 3, speed: 1.5, align: 'right'});
+  $('th.latest').activity({segments: 8, width: 2, space: 0, length: 3, speed: 1.5, align: 'right'});
 
   $.getJSON("http://www.typeful.net/~tbot/log.json", function(response) {
 
     // disable activity indicator
-    $('.hackage-header').activity(false);
+    $('th.latest').activity(false);
 
-    $('.hackage-version').each(function() {
+    $('td.latest').each(function() {
 
       var self = $(this);
       var version = $(response).attr(self.data("package"));

@@ -37,14 +37,16 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       br
       em "Here you are!"
     table ! class_ "table table-bordered" $ do
+
       thead . tr $ do
         th ""
-        th ! class_ "hackage-header" $ "Hackage"
+        th ! class_ "latest" $ "Hackage"
         mapM_ (th . toHtml) versions
+
       tbody $ do
         forM_ packages $ \(name, xs) -> tr $ do
           th (toHtml name)
-          td ! dataAttribute "package" (fromString name) ! class_ "hackage-version" $ do
+          td ! dataAttribute "package" (fromString name) ! class_ "latest" $ do
             packageLatest name
           showVersions xs
 
