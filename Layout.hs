@@ -74,7 +74,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
         go []        = return ()
 
     showPackage :: Bool -> Package -> Html
-    showPackage changed p@(Package _ version visibility) = (cell . new . packageLink) p
+    showPackage changed p@(Package _ version _ _) = (cell . new . packageLink) p
       where
         cell = td ! dataAttribute "version" (fromString version)
         new
@@ -83,21 +83,23 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
     -- group packages by package name
     packages :: [(PackageName, [(PlatformVersion, Package)])]
-    packages =  (sortCI . Map.toList . foldr f Map.empty) releases
+    packages =  (sortCI . ignoreUninteresting . Map.toList . foldr f Map.empty) releases
       where
-        f (Platform version xs ys) m = foldr g m (xs ++ ys)
+        f (Platform version xs) m = foldr g m xs
           where
-            g x@(Package name _ _) = Map.insertWith' (++) name [(version, x)]
+            g x@(Package name _ _ _) = Map.insertWith' (++) name [(version, x)]
 
         -- sort, ignore case
         sortCI = sortBy (compare `on` (map toLower . fst))
 
+        ignoreUninteresting = filter ((`notElem` uninterestingPackages) . fst)
+
     versions :: [PlatformVersion]
-    versions = [v | Platform v _ _ <- releases]
+    versions = [v | Platform v _ <- releases]
 
 -- | Create link to package documentation.
 packageLink :: Package -> Html
-packageLink (Package name version _) = a ! href (fromString url) $ toHtml version
+packageLink (Package name version _ _) = a ! href (fromString url) $ toHtml version
   where
     url
       | name == "ghc" = "http://www.haskell.org/ghc/docs/" ++ version ++ "/html/libraries/ghc-" ++ version ++ "/index.html"

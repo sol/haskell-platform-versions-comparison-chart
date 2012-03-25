@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Config where
 
 type PackageName = String
@@ -11,20 +12,33 @@ data Package = Package {
   packageName       :: PackageName
 , packageVersion    :: PackageVersion
 , packageVisibility :: Visibility
+, packageComesWith  :: Maybe GhcVersion
 } deriving (Eq, Show)
+
+type GhcVersion = String
 
 type PlatformVersion = String
 
 data Platform = Platform {
   platformVersion     :: PlatformVersion
-, platformGhcPackages :: [Package]
 , platformPackages    :: [Package]
 } deriving (Eq, Show)
 
 
 -- | Construct an exposed package.
-package :: PackageName -> PackageVersion -> Package
+package :: PackageName -> PackageVersion -> Maybe GhcVersion -> Package
 package name version = Package name version Exposed
+
+platform
+  :: PlatformVersion
+  -> GhcVersion
+  -> [Maybe GhcVersion -> Package]
+  -> [Maybe GhcVersion -> Package]
+  -> Platform
+platform version ghcVersion ghc hp = Platform version $ addGhcVersion ghc ++ addNothing hp
+  where
+    addGhcVersion = map ($ Just ghcVersion)
+    addNothing    = map ($ Nothing)
 
 -- | A list of Haskell Platform releases.
 --
@@ -37,14 +51,14 @@ package name version = Package name version Exposed
 --
 releases :: [Platform]
 releases =
-  Platform "2011.4.0.0" ghc_7_0_4  hp_2011_4_0_0 :
-  Platform "2011.2.0.1" ghc_7_0_3  hp_2011_2_0_1 :
-  Platform "2011.2.0.0" ghc_7_0_2  hp_2011_2_0_0 :
-  Platform "2010.2.0.0" ghc_6_12_3 hp_2010_2_0_0 :
+  platform "2011.4.0.0" "7.0.4"  ghc_7_0_4  hp_2011_4_0_0 :
+  platform "2011.2.0.1" "7.0.3"  ghc_7_0_3  hp_2011_2_0_1 :
+  platform "2011.2.0.0" "7.0.2"  ghc_7_0_2  hp_2011_2_0_0 :
+  platform "2010.2.0.0" "6.12.3" ghc_6_12_3 hp_2010_2_0_0 :
   []
 
 isPlatformPackage :: PackageName -> Bool
-isPlatformPackage p = p `notElem` [
+isPlatformPackage p = notElem p $ [
   -- GHC includes some packages, that are not part of the Haskell Platform
     "bin-package-db"
   , "dph-base"
@@ -59,10 +73,26 @@ isPlatformPackage p = p `notElem` [
   , "ghc-prim"
   , "haskell-platform"
   , "integer-gmp"
+  ] ++ uninterestingPackages
+
+uninterestingPackages = [
+  -- only included with ghc-6.12.3 (and maybe before?)
+    "dph-base"
+  , "dph-par"
+  , "dph-prim-interface"
+  , "dph-prim-par"
+  , "dph-prim-seq"
+  , "dph-seq"
+
+  -- only documented with ghc-6.12.3 (and maybe before?)
+  , "integer-gmp"
+
+  -- the following packages do not provide any modules
   , "rts"
+  , "ffi"
+  , "haskell-platform"
   ]
 
-ghc_7_0_4 :: [Package]
 ghc_7_0_4 = [
     package "Cabal" "1.10.2.0"
   , package "array" "0.3.0.2"
@@ -92,7 +122,6 @@ ghc_7_0_4 = [
   , package "unix" "2.4.2.0"
   ]
 
-hp_2011_4_0_0 :: [Package]
 hp_2011_4_0_0 = [
     package "GLUT" "2.1.2.1"
   , package "HTTP" "4000.1.2"
@@ -120,7 +149,6 @@ hp_2011_4_0_0 = [
   , package "zlib" "0.5.3.1"
   ]
 
-ghc_7_0_3 :: [Package]
 ghc_7_0_3 = [
     package "Cabal" "1.10.1.0"
   , package "array" "0.3.0.2"
@@ -150,7 +178,6 @@ ghc_7_0_3 = [
   , package "unix" "2.4.2.0"
   ]
 
-hp_2011_2_0_1 :: [Package]
 hp_2011_2_0_1 = [
     package "GLUT" "2.1.2.1"
   , package "HTTP" "4000.1.1"
@@ -178,7 +205,6 @@ hp_2011_2_0_1 = [
   , package "zlib" "0.5.3.1"
   ]
 
-ghc_7_0_2 :: [Package]
 ghc_7_0_2 = [
     package "Cabal" "1.10.1.0"
   , package "array" "0.3.0.2"
@@ -208,7 +234,6 @@ ghc_7_0_2 = [
   , package "unix" "2.4.2.0"
   ]
 
-hp_2011_2_0_0 :: [Package]
 hp_2011_2_0_0 = [
     package "GLUT" "2.1.2.1"
   , package "HTTP" "4000.1.1"
@@ -236,7 +261,6 @@ hp_2011_2_0_0 = [
   , package "zlib" "0.5.3.1"
   ]
 
-ghc_6_12_3 :: [Package]
 ghc_6_12_3 = [
     package "Cabal" "1.8.0.6"
   , package "array" "0.3.0.1"
@@ -273,7 +297,6 @@ ghc_6_12_3 = [
   , package "unix" "2.4.0.2"
   ]
 
-hp_2010_2_0_0 :: [Package]
 hp_2010_2_0_0 = [
     package "GLUT" "2.1.2.1"
   , package "HTTP" "4000.0.9"
