@@ -239,7 +239,7 @@ ghc_6_12_3 :: [Package]
 ghc_6_12_3 = [
     package "Cabal" "1.8.0.6"
   , package "array" "0.3.0.1"
-  , package "base" "3.0.3.2"
+  -- , package "base" "3.0.3.2"
   , package "base" "4.2.0.2"
   , package "bin-package-db" "0.0.0.0"
   , package "bytestring" "0.9.1.7"
