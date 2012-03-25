@@ -112,8 +112,11 @@ packageLink (Package name version _) = a ! href (fromString url) $ toHtml versio
 
 -- | Create link to latest documentation.
 packageLatest :: PackageName -> Html
-packageLatest name = a ! href (fromString url) $ "???"
+packageLatest name = setVisibility (a ! href (fromString url) $ "???")
   where
+    setVisibility x
+      | name == "haskell2010" = "(" >> x >> ")"
+      | otherwise             = x
     url = "http://hackage.haskell.org/package/" ++ name
 
 -- | Create link to platform cabal file.
