@@ -1,2 +1,2 @@
 all:
-	runhaskell Main.hs > index.html
+	runhaskell Main.hs

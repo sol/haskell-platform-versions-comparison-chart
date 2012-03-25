@@ -39,7 +39,7 @@ data Platform = Platform {
 } deriving (Eq, Show)
 
 main :: IO ()
-main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
+main = writeFile "index.html" . (++ "\n") . renderHtml . (docTypeHtml ! lang "en") $ do
   Html.head $ do
     meta ! charset "utf-8"
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/bootstrap.css"
@@ -110,13 +110,19 @@ main = putStrLn . renderHtml . (docTypeHtml ! lang "en") $ do
         Package name version _ = p
         ghcDoc = "http://www.haskell.org/ghc/docs/" ++ version ++ "/html/libraries/ghc-" ++ version ++ "/index.html"
 
-    -- FIXME: cleanup
+    -- group packages by package name
     packages :: [(PackageName, [(PlatformVersion, Package)])]
-    packages =  filter ((`notElem` non_api_packages) . fst) . sortBy (compare `on` (map toLower . fst)) $ Map.toList $ foldr f Map.empty releases
+    packages =  (sortCI . filterNonAPI . Map.toList . foldr f Map.empty) releases
       where
-        f (Platform version xs ys) m = foldr g m (map (\x -> x) xs ++ map (\x -> x) ys)
+        f (Platform version xs ys) m = foldr g m (xs ++ ys)
           where
             g x@(Package name _ _) = Map.insertWith' (++) name [(version, x)]
+
+        -- sort, ignore case
+        sortCI = sortBy (compare `on` (map toLower . fst))
+
+        -- exclude non API packages
+        filterNonAPI = filter ((`notElem` non_api_packages) . fst)
 
     versions :: [PlatformVersion]
     versions = [v | Platform v _ _ <- releases]
