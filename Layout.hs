@@ -3,6 +3,7 @@
 module Layout (chart) where
 
 import           Prelude hiding (div)
+import           Control.Monad (when)
 import           Data.Foldable (forM_)
 import           Data.List (sortBy)
 import           Data.Char (toLower)
@@ -44,7 +45,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
         mapM_ (th . platformLink) versions
 
       tbody $ do
-        forM_ packages $ \(name, xs) -> tr $ do
+        forM_ packages $ \(name, xs) -> when (isPlatformPackage name) . tr $ do
           th (toHtml name)
           td ! dataAttribute "package" (fromString name) ! class_ "latest" $ do
             packageLatest name
@@ -87,7 +88,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
     -- group packages by package name
     packages :: [(PackageName, [(PlatformVersion, Package)])]
-    packages =  (sortCI . filterNonAPI . Map.toList . foldr f Map.empty) releases
+    packages =  (sortCI . Map.toList . foldr f Map.empty) releases
       where
         f (Platform version xs ys) m = foldr g m (xs ++ ys)
           where
@@ -95,9 +96,6 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
         -- sort, ignore case
         sortCI = sortBy (compare `on` (map toLower . fst))
-
-        -- exclude non API packages
-        filterNonAPI = filter ((`notElem` non_api_packages) . fst)
 
     versions :: [PlatformVersion]
     versions = [v | Platform v _ _ <- releases]

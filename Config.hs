@@ -43,8 +43,9 @@ releases =
   Platform "2010.2.0.0" ghc_6_12_3 hp_2010_2_0_0 :
   []
 
-non_api_packages :: [PackageName]
-non_api_packages = [
+isPlatformPackage :: PackageName -> Bool
+isPlatformPackage p = p `notElem` [
+  -- GHC includes some packages, that are not part of the Haskell Platform
     "bin-package-db"
   , "dph-base"
   , "dph-par"
