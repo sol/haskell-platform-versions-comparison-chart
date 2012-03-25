@@ -21,7 +21,7 @@ function loadLatest() {
       var self = $(this);
       var version = $(data).attr(self.data("package"));
       if (version) {
-        if (self.next().text() != version) {
+        if (self.next().data("version") != version) {
           self.html('<span class="alert-success">' + version + '</span>');
         } else {
           self.text(version);

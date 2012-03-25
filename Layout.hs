@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
-module Layout where
+module Layout (chart) where
 
 import           Prelude hiding (div)
 import           Data.Foldable (forM_)
@@ -18,6 +18,7 @@ import           Text.Blaze.Html5.Attributes hiding (title, name, id)
 
 import           Config
 
+-- | The generated document.
 chart :: String
 chart = renderHtml . (docTypeHtml ! lang "en") $ do
   Html.head $ do
@@ -70,10 +71,12 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
 
 
     showPackageVersion :: Bool -> Package -> Html
-    showPackageVersion changed p =
-      (td . new) s
+    showPackageVersion changed p@(Package _ version visibility) =
+      (cell . new) s
       where
-        s = case packageVisibility p of
+        cell = td ! dataAttribute "version" (fromString version)
+
+        s = case visibility of
           Exposed -> createDocLink p
           Hidden  -> "(" >> createDocLink p >> ")"
         new
@@ -107,8 +110,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
     versions :: [PlatformVersion]
     versions = [v | Platform v _ _ <- releases]
 
-
-
+-- | Create a "Fork me on GitHub" link.
 forkMe :: AttributeValue -> Html
 forkMe url = do
   a ! href url $ do
