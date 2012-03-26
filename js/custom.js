@@ -32,6 +32,9 @@ function hackagePackageVersionsCallback(response) {
     }
   });
 
-  // disable activity indicator
-  $('th.latest').activity(false);
+  // Disable activity indicator.  We delay this by 300ms so that the activity
+  // indicator is perceived on instant responses.
+  setTimeout(function() {
+    $('th.latest').activity(false);
+  }, 300);
 }
