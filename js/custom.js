@@ -11,7 +11,7 @@ function loadLatest() {
   // enable activity indicator
   $('th.latest').activity({segments: 8, width: 2, space: 0, length: 3, speed: 1.5, align: 'right'});
 
-  $.getScript("http://www.typeful.net/~tbot/hackage-package-versions.jsonp");
+  $.getScript("http://www.typeful.net/~tbot/hackage/latest-package-versions.jsonp");
 }
 
 // this is triggered by loadLatest()
