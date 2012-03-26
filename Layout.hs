@@ -45,23 +45,19 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
         "enable JavaScript"
       "."
 
+    h2 "Platform Libraries"
+    Html.p $ do
+      "The "
+      hp
+      " is the blessed set of libraries and tools on"
+      " which to build further Haskell libraries and applications.  It is"
+      " intended to provide a comprehensive, stable, and quality tested base for"
+      " Haskell projects to work from."
     table ! class_ "table table-bordered" $ do
-      h2 "Platform Libraries"
-
-      Html.p $ do
-        "The "
-        hp
-        " is the blessed set of libraries and tools on"
-        " which to build further Haskell libraries and applications.  It is"
-        " intended to provide a comprehensive, stable, and quality tested base for"
-        " Haskell projects to work from."
-
-
       thead . tr $ do
         th ""
         th ! class_ "latest" $ "Hackage"
         mapM_ (th . platformLink) (map fst versions)
-
       tbody $ do
         forM_ packages $ \(name, xs) -> when (isPlatformPackage name) . tr $ do
           th (toHtml name)
@@ -70,17 +66,16 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
           showVersions xs
 
 
+    h2 "GHC Libraries"
+    Html.p $ do
+      " GHC provides additional libraries which are not part of the "
+      hp
+      "."
     table ! class_ "table table-bordered" $ do
-      h2 "GHC Libraries"
-      Html.p $ do
-        " GHC provides additional libraries which are not part of the "
-        hp
-        "."
       thead . tr $ do
         th ""
         th "Latest"
         mapM_ (th . toHtml) (map snd versions)
-
       tbody $ do
         forM_ packages $ \(name, xs) -> when (not . isPlatformPackage $ name) . tr $ do
           th (toHtml name)
