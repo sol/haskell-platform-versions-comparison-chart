@@ -11,25 +11,27 @@ function loadLatest() {
   // enable activity indicator
   $('th.latest').activity({segments: 8, width: 2, space: 0, length: 3, speed: 1.5, align: 'right'});
 
-  $.getScript("http://www.typeful.net/~tbot/hackage-package-versions.jsonp", function() {
+  $.getScript("http://www.typeful.net/~tbot/hackage-package-versions.jsonp");
+}
 
-    // disable activity indicator
-    $('th.latest').activity(false);
+// this is triggered by loadLatest()
+function hackagePackageVersionsCallback(response) {
 
-    var response = $(hackagePackageVersions)
-    hackagePackageVersions = null;
+  var versions = $(response);
 
-    $('td.latest').each(function() {
-
-      var self = $(this);
-      var version = response.attr(self.data("package"));
-      if (version) {
-        var c = self.children("a");
-        c.text(version);
-        if (self.next().data("version") != version) {
-          c.addClass("alert-success");
-        }
+  // insert latest version for each package
+  $('td.latest').each(function() {
+    var self = $(this);
+    var version = versions.attr(self.data("package"));
+    if (version) {
+      var c = self.children("a");
+      c.text(version);
+      if (self.next().data("version") != version) {
+        c.addClass("alert-success");
       }
-    });
+    }
   });
+
+  // disable activity indicator
+  $('th.latest').activity(false);
 }
