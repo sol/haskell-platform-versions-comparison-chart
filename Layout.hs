@@ -25,7 +25,7 @@ chart :: String
 chart = renderHtml . (docTypeHtml ! lang "en") $ do
   Html.head $ do
     meta ! charset "utf-8"
-    link ! rel "stylesheet" ! type_ "text/css" ! href "css/bootstrap.css"
+    link ! rel "stylesheet" ! type_ "text/css" ! href "http://sol.github.com/get-bootstrapped/bootstrap/2.0.2/css/bootstrap.min.css"
     link ! rel "stylesheet" ! type_ "text/css" ! href "css/custom.css"
 
     title "Haskell Platform Versions Comparison Chart"
@@ -86,7 +86,6 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
     forkMe "https://github.com/sol/haskell-platform-versions-comparison-chart"
 
     load "http://code.jquery.com/jquery-1.7.2.min.js"
-    -- load "js/bootstrap.js"
     load "js/activity-indicator.js" -- from https://github.com/neteye/jquery-plugins
     load "js/custom.js"
 
