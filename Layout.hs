@@ -3,7 +3,7 @@
 module Layout (chart) where
 
 import           Prelude hiding (div)
-import           Control.Monad (when)
+import           Control.Monad (unless, when)
 import           Data.Foldable (forM_)
 import           Data.List (sortBy, find)
 import           Data.Char (toLower)
@@ -57,12 +57,19 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       thead . tr $ do
         th ""
         th ! class_ "latest" $ "Hackage"
-        mapM_ (th . platformLink) (map fst versions)
+        mapM_ (th . platformLink . fst) versions
       tbody $ do
         forM_ packages $ \(name, xs) -> when (isPlatformPackage name) . tr $ do
+
+          -- package name
           th (toHtml name)
+
+          -- latest version
           td ! dataAttribute "package" (fromString name) ! class_ "latest" $ do
-            packageLatest name
+            let url = "http://hackage.haskell.org/package/" ++ name
+            a ! href (fromString url) $ "???"
+
+          -- other versions
           showVersions xs
 
 
@@ -75,12 +82,21 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       thead . tr $ do
         th ""
         th "Latest"
-        mapM_ (th . toHtml) (map snd versions)
+        mapM_ (th . toHtml . snd) versions
       tbody $ do
-        forM_ packages $ \(name, xs) -> when (not . isPlatformPackage $ name) . tr $ do
+        forM_ packages $ \(name, xs) -> unless (isPlatformPackage name) . tr $ do
+
+          -- package name
           th (toHtml name)
-          td ! dataAttribute "package" (fromString name) ! class_ "latest" $ do
-            packageLatest name
+
+          -- latest version
+          case find ((== name) . packageName) ghc_latest of
+            Just p -> do
+              let versionChanged = (packageVersion . snd . head) xs /= packageVersion p
+              showPackage versionChanged p
+            Nothing -> th mempty
+
+          -- other versions
           showVersions xs
 
     forkMe "https://github.com/sol/haskell-platform-versions-comparison-chart"
@@ -143,16 +159,6 @@ packageLink (Package name version _ mGhcVersion) = a ! href (fromString url) $ t
 -- | Construct URL to documentation of ghc package.
 ghcDocUrl :: GhcVersion -> PackageName -> PackageVersion -> String
 ghcDocUrl ghc name version = "http://www.haskell.org/ghc/docs/" ++ ghc ++ "/html/libraries/" ++ name ++ "-" ++ version ++ "/index.html"
-
--- | Create link to latest documentation.
-packageLatest :: PackageName -> Html
-packageLatest name
-  | (not . isPlatformPackage) name = case find ((== name) . packageName) ghc_latest of
-                Just (Package _ v _ (Just ghc)) -> a ! href (fromString $ ghcDocUrl ghc name v) $ toHtml v
-                _                               -> mempty
-  | otherwise = a ! href (fromString url) $ "???"
-  where
-    url = "http://hackage.haskell.org/package/" ++ name
 
 -- | Create link to platform cabal file.
 platformLink :: PlatformVersion -> Html
