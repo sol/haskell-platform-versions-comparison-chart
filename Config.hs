@@ -64,7 +64,8 @@ releases =
 isPlatformPackage :: PackageName -> Bool
 isPlatformPackage p = notElem p $ [
   -- GHC includes some packages, that are not part of the Haskell Platform
-    "bin-package-db"
+    "binary"
+  , "bin-package-db"
   , "dph-base"
   , "dph-par"
   , "dph-prim-interface"
@@ -76,6 +77,7 @@ isPlatformPackage p = notElem p $ [
   , "ghc-binary"
   , "ghc-prim"
   , "haskell-platform"
+  , "hoopl"
   , "integer-gmp"
   , "rts"
   ]

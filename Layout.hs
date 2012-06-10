@@ -81,7 +81,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
     table ! class_ "table table-bordered" $ do
       thead . tr $ do
         th ""
-        th "Latest"
+        th "Latest GHC"
         mapM_ (th . toHtml . snd) versions
       tbody $ do
         forM_ packages $ \(name, xs) -> unless (isPlatformPackage name) . tr $ do
