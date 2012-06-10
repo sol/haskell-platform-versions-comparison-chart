@@ -15,7 +15,7 @@ import qualified Data.Map as Map
 
 import           Text.Blaze.Html5 hiding (p, head, map, style)
 import qualified Text.Blaze.Html5 as Html
-import           Text.Blaze.Renderer.String (renderHtml)
+import           Text.Blaze.Html.Renderer.String (renderHtml)
 import           Text.Blaze.Html5.Attributes hiding (title, name, id)
 
 import           Config
