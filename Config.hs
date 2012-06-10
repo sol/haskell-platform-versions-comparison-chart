@@ -54,6 +54,7 @@ ghcPackages version = map ($ Just version)
 --
 releases :: [Platform]
 releases =
+  platform "2012.2.0.0" "7.4.1"  ghc_7_4_1  hp_2012_2_0_0 :
   platform "2011.4.0.0" "7.0.4"  ghc_7_0_4  hp_2011_4_0_0 :
   platform "2011.2.0.1" "7.0.3"  ghc_7_0_3  hp_2011_2_0_1 :
   platform "2011.2.0.0" "7.0.2"  ghc_7_0_2  hp_2011_2_0_0 :
@@ -97,7 +98,9 @@ uninterestingPackages = [
   , "haskell-platform"
   ]
 
-ghc_latest = ghcPackages "7.4.1" [
+ghc_latest = ghcPackages "7.4.1" ghc_7_4_1
+
+ghc_7_4_1 = [
     package "Cabal" "1.14.0"
   , package "array" "0.4.0.0"
   , package "base" "4.5.0.0"
@@ -124,6 +127,33 @@ ghc_latest = ghcPackages "7.4.1" [
   , package "template-haskell" "2.7.0.0"
   , package "time" "1.4"
   , package "unix" "2.5.1.0"
+  ]
+
+hp_2012_2_0_0 = [
+    package "GLUT" "2.1.2.1"
+  , package "HTTP" "4000.2.3"
+  , package "HUnit" "1.2.4.2"
+  , package "OpenGL" "2.2.3.1"
+  , package "QuickCheck" "2.4.2"
+  , package "cgi" "3001.1.7.4"
+  , package "fgl" "5.4.2.4"
+  , package "haskell-platform" "2012.2.0.0"
+  , package "haskell-src" "1.0.1.5"
+  , package "html" "1.0.1.2"
+  , package "mtl" "2.1.1"
+  , package "network" "2.3.0.13"
+  , package "parallel" "3.2.0.2"
+  , package "parsec" "3.1.2"
+  , package "random" "1.0.1.1"
+  , package "regex-base" "0.93.2"
+  , package "regex-compat" "0.95.1"
+  , package "regex-posix" "0.95.1"
+  , package "stm" "2.3"
+  , package "syb" "0.3.6.1"
+  , package "text" "0.11.2.0"
+  , package "transformers" "0.3.0.0"
+  , package "xhtml" "3000.2.1"
+  , package "zlib" "0.5.3.3"
   ]
 
 ghc_7_0_4 = [
