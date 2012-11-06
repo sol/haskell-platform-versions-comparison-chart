@@ -17,6 +17,7 @@ import           Text.Blaze.Html5 hiding (p, head, map, style)
 import qualified Text.Blaze.Html5 as Html
 import           Text.Blaze.Html.Renderer.String (renderHtml)
 import           Text.Blaze.Html5.Attributes hiding (title, name, id)
+import qualified Text.Blaze.Html5.Attributes as A
 
 import           Config
 
@@ -35,9 +36,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       small "Haskell Platform "
       "Versions Comparison Chart"
     blockquote . Html.p $ do
-      em "Ever wanted to know what version of a package is in what Haskell Platform?"
-      br
-      em "Here you are!"
+      em "Ever wanted to know what version of a package is in what Haskell Platform?  Here you go!"
 
     noscript . (div ! class_ "alert alert-error") $ do
       "The latest package versions on Hackage will only be shown if you "
@@ -53,7 +52,8 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       " which to build further Haskell libraries and applications.  It is"
       " intended to provide a comprehensive, stable, and quality tested base for"
       " Haskell projects to work from."
-    table ! class_ "table table-bordered" $ do
+
+    mkTable $ do
       thead . tr $ do
         th ""
         th ! class_ "latest" $ "Hackage"
@@ -78,7 +78,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       " GHC provides additional libraries which are not part of the "
       hp
       "."
-    table ! class_ "table table-bordered" $ do
+    mkTable $ do
       thead . tr $ do
         th ""
         th "Latest GHC"
@@ -94,7 +94,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
             Just p -> do
               let versionChanged = (packageVersion . snd . head) xs /= packageVersion p
               showPackage versionChanged p
-            Nothing -> th mempty
+            Nothing -> td mempty
 
           -- other versions
           showVersions xs
@@ -106,6 +106,12 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
     load "js/custom.js"
 
   where
+    mkTable c = table ! class_ "table table-bordered" $ do
+      colgroup $ do
+        col ! class_ "first-column"
+        col ! A.span "7" ! class_ "other-columns"
+      c
+
     hp = a ! href "http://hackage.haskell.org/platform/" $ "Haskell Platform"
 
     load s = script ! src s $ ""

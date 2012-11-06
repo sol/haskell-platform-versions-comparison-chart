@@ -1,11 +1,15 @@
-td {
-  width: 13.5%;
-}
-
 table a {
   color: inherit;
 }
 
 table .alert-success {
   color: inherit;
+}
+
+.first-column {
+  width: 17.4%;
+}
+
+.other-columns {
+  width: 11.8%;
 }
