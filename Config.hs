@@ -101,7 +101,35 @@ uninterestingPackages = [
   , "haskell-platform"
   ]
 
-ghc_latest = ghcPackages "7.4.2" ghc_7_4_2
+ghc_latest = ghcPackages "7.6.1" ghc_7_6_1
+
+ghc_7_6_1 = [
+    package "Cabal" "1.16.0"
+  , package "array" "0.4.0.1"
+  , package "base" "4.6.0.0"
+  , package "bin-package-db" "0.0.0.0"
+  , package "binary" "0.5.1.1"
+  , package "bytestring" "0.10.0.0"
+  , package "containers" "0.5.0.0"
+  , package "deepseq" "1.3.0.1"
+  , package "directory" "1.2.0.0"
+  , package "filepath" "1.3.0.1"
+  , Package "ghc" "7.6.1" Hidden
+  , package "ghc-prim" "0.3.0.0"
+  , Package "haskell2010" "1.1.1.0" Hidden
+  , Package "haskell98" "2.0.0.2" Hidden
+  , package "hoopl" "3.9.0.0"
+  , package "hpc" "0.6.0.0"
+  , package "integer-gmp" "0.5.0.0"
+  , package "old-locale" "1.0.0.5"
+  , package "old-time" "1.1.0.1"
+  , package "pretty" "1.1.1.0"
+  , package "process" "1.1.0.2"
+  , package "rts" "1.0"
+  , package "template-haskell" "2.8.0.0"
+  , package "time" "1.4.0.1"
+  , package "unix" "2.6.0.0"
+  ]
 
 ghc_7_4_2 = [
     package "Cabal" "1.14.0"
