@@ -54,6 +54,7 @@ ghcPackages version = map ($ Just version)
 --
 releases :: [Platform]
 releases =
+  platform "2012.4.0.0" "7.4.2"  ghc_7_4_2  hp_2012_4_0_0 :
   platform "2012.2.0.0" "7.4.1"  ghc_7_4_1  hp_2012_2_0_0 :
   platform "2011.4.0.0" "7.0.4"  ghc_7_0_4  hp_2011_4_0_0 :
   platform "2011.2.0.1" "7.0.3"  ghc_7_0_3  hp_2011_2_0_1 :
@@ -129,6 +130,37 @@ ghc_7_4_2 = [
   , package "template-haskell" "2.7.0.0"
   , package "time" "1.4"
   , package "unix" "2.5.1.1"
+  ]
+
+hp_2012_4_0_0 = [
+    package "GLUT" "2.1.2.1"
+  , package "HTTP" "4000.2.5"
+  , package "HUnit" "1.2.5.1"
+  , package "OpenGL" "2.2.3.1"
+  , package "QuickCheck" "2.5.1.1"
+  , package "async" "2.0.1.3"
+  , package "cgi" "3001.1.7.4"
+  , package "fgl" "5.4.2.4"
+  , package "haskell-platform" "2012.4.0.0"
+  , package "haskell-src" "1.0.1.5"
+  , package "html" "1.0.1.2"
+  , package "mtl" "2.1.2"
+  , package "network" "2.3.1.0"
+  , package "parallel" "3.2.0.3"
+  , package "parsec" "3.1.3"
+  , package "primitive" "0.5.0.1"
+  , package "random" "1.0.1.1"
+  , package "regex-base" "0.93.2"
+  , package "regex-compat" "0.95.1"
+  , package "regex-posix" "0.95.2"
+  , package "split" "0.2.1.1"
+  , package "stm" "2.4"
+  , package "syb" "0.3.7"
+  , package "text" "0.11.2.3"
+  , package "transformers" "0.3.0.0"
+  , package "vector" "0.10.0.1"
+  , package "xhtml" "3000.2.1"
+  , package "zlib" "0.5.4.0"
   ]
 
 ghc_7_4_1 = [
