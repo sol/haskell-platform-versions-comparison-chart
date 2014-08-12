@@ -5,6 +5,7 @@ module Layout (chart) where
 import           Prelude hiding (div)
 import           Control.Monad (unless, when)
 import           Data.Foldable (forM_)
+import           Data.Monoid
 import           Data.List (sortBy, find)
 import           Data.Char (toLower)
 import           Data.Function (on)
@@ -36,7 +37,7 @@ chart = renderHtml . (docTypeHtml ! lang "en") $ do
       small "Haskell Platform "
       "Versions Comparison Chart"
     blockquote . Html.p $ do
-      em "Ever wanted to know what version of a package is in what Haskell Platform?  Here you go!"
+      em "NOTE: The Haskell Platform website comes with its own " <> (a ! href "http://www.haskell.org/platform/changelog.html" $ "Changelog") <> " now, which is more up-to-date."
 
     noscript . (div ! class_ "alert alert-error") $ do
       "The latest package versions on Hackage will only be shown if you "
